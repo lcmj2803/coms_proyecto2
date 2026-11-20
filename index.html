@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RadioML Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03070B; --card:#08121B; --inset:#060E15; --line:#123349; --track:#0C2131;
+  --text:#BDEBFA; --muted:#5FA9C9; --faded:#3E6E86; --accent:#29C6F2; --active-bg:#0A2232;
+  --glow:rgba(41,198,242,.28); --hover:#E8FBFF;
+  --code-bg:#02070C; --kw:#29C6F2; --str:#5FE0C4; --com:#4C7A90; --num:#9ADCF7; --fn:#E8FBFF;
+  --sans:'Space Grotesk',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);background-image:radial-gradient(circle at 50% 0,rgba(41,198,242,.10),transparent 55%),linear-gradient(rgba(41,198,242,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(41,198,242,.035) 1px,transparent 1px);background-size:100% 100%,32px 32px,32px 32px;background-attachment:fixed;color:var(--text);font-family:var(--mono)}
+a{color:var(--text)}a:hover{color:var(--hover)}
+a:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.wrap{max-width:1320px;margin:0 auto;padding:40px 16px 56px;display:flex;flex-direction:column;gap:28px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.label{font-size:12px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.small{font-size:13px;color:var(--muted);line-height:1.55}
+
+header{display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--line);padding-bottom:24px}
+h1{margin:0;font-family:var(--sans);font-weight:700;font-size:clamp(32px,6vw,48px);line-height:1.05;color:var(--accent);text-shadow:0 0 18px var(--glow)}
+
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:8px;background:var(--inset);text-decoration:none;font-size:14px}
+.links a:hover{border-color:var(--accent);box-shadow:0 0 12px var(--glow)}
+
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.chain a{flex:1 1 150px;border:1px solid var(--accent);border-radius:8px;padding:10px 12px;background:var(--active-bg);display:flex;flex-direction:column;gap:4px;text-decoration:none;box-shadow:0 0 14px var(--glow) inset}
+.chain a:hover{box-shadow:0 0 18px var(--glow)}
+.chain a b{font-family:var(--sans);font-size:16px;color:var(--text)}
+.chain .arrow{align-self:center;color:var(--muted)}
+
+.block{display:flex;flex-direction:column;gap:18px;padding:22px}
+.block-head{display:flex;flex-direction:column;gap:6px}
+h2{margin:0;font-family:var(--sans);font-size:26px;font-weight:700;color:var(--accent)}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.fact{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--text);background:var(--inset)}
+.fact b{color:var(--accent)}
+
+.body{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));align-items:start}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+
+/* "Captura" de código */
+.shot{box-shadow:0 0 16px rgba(41,198,242,.10);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--code-bg);min-width:0}
+.shot-bar{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--inset)}
+.dot{flex:none;width:11px;height:11px;border-radius:50%}
+.dot:nth-child(1){background:#29C6F2}.dot:nth-child(2){background:#1FA79B}.dot:nth-child(3){background:#1B4A66}
+.shot-bar .file{margin-left:8px;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+pre{margin:0;padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.6;color:var(--text);tab-size:4}
+pre code{font-family:var(--mono)}
+.hljs-keyword,.hljs-built_in,.hljs-literal{color:var(--kw)}
+.hljs-string{color:var(--str)}
+.hljs-comment,.hljs-meta{color:var(--com);font-style:italic}
+.hljs-number{color:var(--num)}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:var(--fn);font-weight:700}
+
+figure{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+figure a.img{display:block;background:#fff;border-radius:8px;padding:6px;border:1px solid var(--line)}
+figure img{display:block;width:100%;height:auto;border-radius:4px}
+figcaption{font-size:12px;color:var(--muted);line-height:1.5}
+figcaption code{color:var(--text)}
+
+footer{display:flex;flex-wrap:wrap;gap:12px 24px;border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="label" style="margin:0">COMII · Proyecto 2 · AMC · lo que ya está hecho</p>
+  <h1>RadioML Command Center</h1>
+  <p class="small" style="margin:0;font-size:15px">Una observación I/Q entra; salen cuatro respuestas: ¿hay señal? → ¿con qué SNR? → ¿qué modulación? → ¿con cuánta confianza? Abajo, cada bloque terminado con su código y su resultado.</p>
+</header>
+
+<nav class="links" aria-label="Accesos">
+  <a href="https://app.notion.com/p/410a42b5bf6d81ba9703c7ce3ce4ef92">Notion · tareas y bitácora</a>
+  <a href="obsidian://open?vault=Proyectos&amp;file=RadioML">Obsidian · hub RadioML</a>
+  <a href="notebooks/">notebooks/</a>
+  <a href="src/">src/</a>
+  <a href="figs/">figs/</a>
+  <a href="docs/">docs/</a>
+</nav>
+
+<section class="card" aria-label="Bloques hechos" style="display:flex;flex-direction:column;gap:12px">
+  <span class="label">Bloques terminados</span>
+  <div class="chain">
+    <a href="#b1"><span class="label">Bloque 1</span><b>Generación</b></a><span class="arrow">→</span>
+    <a href="#b2"><span class="label">Bloque 2</span><b>Detección y SNR</b></a><span class="arrow">→</span>
+    <a href="#b3"><span class="label">Bloques 3–4</span><b>Cumulantes + RF</b></a><span class="arrow">→</span>
+    <a href="#b5"><span class="label">Bloque 5</span><b>CNN 1D</b></a>
+  </div>
+</section>
+
+<!-- ============================ BLOQUE 1 ============================ -->
+<section class="card block" id="b1" aria-labelledby="h-b1">
+  <div class="block-head">
+    <span class="label">Bloque 1 · <code>src/generator.py</code> · <code>01_generador(2).ipynb</code> · <code>02_eda.ipynb</code></span>
+    <h2 id="h-b1">Generación del dataset</h2>
+    <p class="small" style="margin:0">Seis modulaciones más ruido: constelación con E<sub>s</sub> = 1 → RRC (β = 0.35, sps = 8) → multitrayecto Rayleigh → CFO y fase → AWGN con N<sub>0</sub> = 1 → ganancia A.</p>
+  </div>
+  <div class="facts">
+    <span class="fact"><b>56 000</b> train · <b>11 200</b> val · <b>11 200</b> test</span>
+    <span class="fact">(2, 1024) float32</span>
+    <span class="fact"><b>7</b> clases balanceadas</span>
+    <span class="fact">semillas 1 / 2 / 3 · 0 duplicados</span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/generator.py · channel()</span></div>
+<pre><code class="language-python">def channel(x, rng, snr_db, sps=8, cfo=0.0, phase=0.0, amp=1.0, fading=True,
+            delays=(0, 1, 2), powers_db=(0.0, -10.0, -20.0)):
+    """Señal limpia (Es = 1) -&gt; fading -&gt; CFO/fase -&gt; AWGN -&gt; ganancia del receptor.
+
+    Devuelve (y, meta). meta["snr_inst_db"] es el Es/N0 real de esta
+    realización, después del fading.
+    """
+    s = x * np.sqrt(10.0 ** (snr_db / 10.0))         # Es = 10^(snr/10), N0 = 1
+    if fading:
+        s, _ = rayleigh_multipath(s, rng, delays, powers_db)
+    s = cfo_phase(s, cfo, phase)
+    es_inst = sps * np.mean(np.abs(s) ** 2)          # energía por símbolo medida
+    y = amp * (s + awgn(len(s), rng))                # la ganancia no cambia el SNR
+    meta = {"snr_db": snr_db,
+            "snr_inst_db": float(10.0 * np.log10(es_inst)),
+            "cfo": cfo, "phase": phase, "amp": amp, "fading": fading}
+    return y.astype(np.complex64), meta</code></pre>
+      </div>
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/generator.py · constellation()</span></div>
+<pre><code class="language-python">def constellation(mod):
+    """Devuelve los M puntos de la constelación, normalizados a energía media 1."""
+    if mod == "BPSK":
+        c = _psk(2)                  # {+1, -1}: igual que 2b-1 de tu notebook
+    elif mod == "QPSK":
+        c = _psk(4, np.pi / 4)       # rotada 45° para quedar en las diagonales
+    # … 8PSK, 16QAM, 64QAM, 16APSK …
+
+    Es = np.mean(np.abs(c) ** 2)     # energía media por símbolo
+    c = c / np.sqrt(Es)              # ahora mean(|c|^2) = 1
+    return c.astype(np.complex64)</code></pre>
+      </div>
+    </div>
+    <div class="col">
+      <figure>
+        <a class="img" href="figs/generador/02_etapas_canal_16qam.png"><img src="figs/generador/02_etapas_canal_16qam.png" alt="16QAM limpia, tras multitrayecto Rayleigh, tras CFO y fase, y tras AWGN a 20 dB" loading="lazy"></a>
+        <figcaption>16QAM etapa por etapa a la salida del filtro acoplado: limpia → multitrayecto → CFO y fase → AWGN (20 dB). <code>01_generador</code>, celda 15.</figcaption>
+      </figure>
+      <figure>
+        <a class="img" href="figs/generador/01_constelaciones.png"><img src="figs/generador/01_constelaciones.png" alt="Las seis constelaciones normalizadas a Es = 1" loading="lazy"></a>
+        <figcaption>Las seis constelaciones, todas con E<sub>s</sub> = 1.00. <code>01_generador</code>, celda 5.</figcaption>
+      </figure>
+      <figure>
+        <a class="img" href="figs/eda/01_balance_clases_train.png"><img src="figs/eda/01_balance_clases_train.png" alt="Balance de clases en train" loading="lazy"></a>
+        <figcaption>Balance de clases en train. <code>02_eda</code>.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ BLOQUE 2 ============================ -->
+<section class="card block" id="b2" aria-labelledby="h-b2">
+  <div class="block-head">
+    <span class="label">Bloque 2 · <code>src/detection.py</code> · <code>03_deteccion.ipynb</code></span>
+    <h2 id="h-b2">Detección de señal y estimación de SNR</h2>
+    <p class="small" style="margin:0">El estadístico T = potencia media dentro de banda / fuera de banda decide si hay señal (umbral GAMMA para P<sub>fa</sub> = 0.01) y, con el mismo T, da el SNR: E<sub>s</sub>/N<sub>0</sub> ≈ 1.3516·(T − 1). La ganancia A se cancela y no depende de la modulación.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">P<sub>fa</sub> medida <b>0.00987</b> (987 / 100 000)</span>
+    <span class="fact">GAMMA = <b>1.208</b> · cuantil 0.99 de F(346, 1638)</span>
+    <span class="fact">P<sub>d</sub>: 0.77 a 0 dB · 0.98 a 10 dB</span>
+    <span class="fact">SNR espectral: RMSE <b>0.2–0.6 dB</b> desde 0 dB</span>
+    <span class="fact">M2M4: hasta 9 dB de RMSE en QAM/APSK</span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/detection.py · calcular_T() · detectar_senal()</span></div>
+<pre><code class="language-python">def calcular_T(signal):
+    N = len(signal)
+    spectrum = np.fft.fft(signal)
+    frequencies = np.fft.fftfreq(N, d=1.0)
+    power = np.abs(spectrum)**2/N
+
+    inside = np.abs(frequencies) &lt;= BAND_EDGE
+    outside = np.abs(frequencies) &gt; OUTSIDE_EDGE
+
+    return np.mean(power[inside]) / np.mean(power[outside])
+
+# Bajo ruido puro, T ~ F(2*K_INSIDE, 2*K_OUTSIDE)
+T_NOISE_DISTRIBUTION = f_distribution(2 * K_INSIDE, 2 * K_OUTSIDE)
+GAMMA = float(T_NOISE_DISTRIBUTION.ppf(1.0 - P_FA))
+
+def detectar_senal(signal):
+    # … validación de forma y de T finito …
+    statistic = float(calcular_T(signal))
+    return statistic &gt; GAMMA</code></pre>
+      </div>
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/detection.py · estimar_snr_espectral()</span></div>
+<pre><code class="language-python"># Es/N0 ≈ (T - 1) * FACTOR_SNR_ESPECTRAL.
+FACTOR_SNR_ESPECTRAL = SPS * K_INSIDE / float(N_SAMPLES)
+
+def estimar_snr_espectral(signal):
+    # … validación de forma y de T finito …
+    statistic = float(calcular_T(signal))
+    if statistic &lt;= 1.0:
+        return SNR_PISO_DB
+
+    snr_linear = (statistic - 1.0) * FACTOR_SNR_ESPECTRAL
+    snr_db = 10.0 * np.log10(snr_linear)
+    # … recorte a [SNR_PISO_DB, SNR_TECHO_DB] …</code></pre>
+      </div>
+      <figure>
+        <a class="img" href="figs/deteccion/06_T_ruido_histograma_vs_teoria.png"><img src="figs/deteccion/06_T_ruido_histograma_vs_teoria.png" alt="Histograma de T bajo ruido contra la distribución F teórica" loading="lazy"></a>
+        <figcaption>T bajo ruido puro contra la F(346, 1638) teórica: de ahí sale GAMMA.</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <figure>
+        <a class="img" href="figs/deteccion/07_pd_vs_esn0_val.png"><img src="figs/deteccion/07_pd_vs_esn0_val.png" alt="Probabilidad de detección contra Es/N0 en val" loading="lazy"></a>
+        <figcaption>Exp. 1 · P<sub>d</sub> contra E<sub>s</sub>/N<sub>0</sub> nominal en val. Sube lento por el fading Rayleigh.</figcaption>
+      </figure>
+      <figure>
+        <a class="img" href="figs/deteccion/14_espectral_vs_m2m4_rmse.png"><img src="figs/deteccion/14_espectral_vs_m2m4_rmse.png" alt="RMSE del estimador espectral contra M2M4" loading="lazy"></a>
+        <figcaption>RMSE del SNR: espectral contra M2M4. En la cadena va el espectral; M2M4 se presenta como comparación.</figcaption>
+      </figure>
+      <figure>
+        <a class="img" href="figs/deteccion/11_m2m4_ciega_vs_curtosis_16qam.png"><img src="figs/deteccion/11_m2m4_ciega_vs_curtosis_16qam.png" alt="M2M4 a ciegas contra con curtosis verdadera en 16QAM" loading="lazy"></a>
+        <figcaption>M2M4 en 16QAM: a ciegas se satura en ≈ 6.7 dB; con la curtosis verdadera falla a SNR alto.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== BLOQUES 3–4 ========================== -->
+<section class="card block" id="b3" aria-labelledby="h-b3">
+  <div class="block-head">
+    <span class="label">Bloques 3–4 · <code>src/features.py</code> · <code>04_features.ipynb</code></span>
+    <h2 id="h-b3">Cumulantes + Random Forest</h2>
+    <p class="small" style="margin:0">Cada observación se centra, se normaliza a potencia 1 y se resume en cumulantes de orden 2, 4 y 6. Un Random Forest de 200 árboles clasifica con 5 de ellos: C21 queda fuera porque, tras normalizar, vale siempre 1.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">exactitud en val <b>36.26 %</b></span>
+    <span class="fact">200 árboles · 5 features</span>
+    <span class="fact">26–47 % de cada modulación cae en «ruido»</span>
+    <span class="fact"><code>models/random_forest.joblib</code></span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/features.py · calculate_cumulants()</span></div>
+<pre><code class="language-python">def calculate_cumulants(signal):
+    """Estimar cumulantes mediante momentos de la observacion normalizada."""
+    z = normalize_power(signal)
+    z_conj = np.conjugate(z)
+    magnitude_squared = np.abs(z) ** 2
+
+    # Momentos de orden 2.
+    m20 = np.mean(z ** 2)
+    m21 = np.mean(magnitude_squared)
+
+    # Momentos de orden 4.
+    m40 = np.mean(z ** 4)
+    m42 = np.mean(magnitude_squared ** 2)
+    # … m30, m31, m41, m60, m63 …
+
+    c40 = m40 - 3.0 * m20 ** 2
+
+    c42 = (
+        m42
+        - np.abs(m20) ** 2
+        - 2.0 * m21 ** 2
+    )
+    # … c60, c63 …
+
+    return {
+        "C20": c20,
+        "C21": float(np.real(c21)),
+        "C40": c40,
+        "C42": float(np.real(c42)),
+        "C60": c60,
+        "C63": float(np.real(c63)),
+    }</code></pre>
+      </div>
+    </div>
+    <div class="col">
+      <figure>
+        <a class="img" href="figs/clasificacion/03_confusion_porcentajes_val.png"><img src="figs/clasificacion/03_confusion_porcentajes_val.png" alt="Matriz de confusión del Random Forest en porcentajes" loading="lazy"></a>
+        <figcaption>Exp. 2 · matriz de confusión del RF en val (%).</figcaption>
+      </figure>
+      <figure>
+        <a class="img" href="figs/clasificacion/01_exactitud_vs_esn0_val.png"><img src="figs/clasificacion/01_exactitud_vs_esn0_val.png" alt="Exactitud del Random Forest contra Es/N0" loading="lazy"></a>
+        <figcaption>Exactitud del RF contra E<sub>s</sub>/N<sub>0</sub> en val.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ BLOQUE 5 ============================ -->
+<section class="card block" id="b5" aria-labelledby="h-b5">
+  <div class="block-head">
+    <span class="label">Bloque 5 · <code>src/models.py</code> · <code>05_cnn_1d.ipynb</code></span>
+    <h2 id="h-b5">Clasificación con CNN 1D</h2>
+    <p class="small" style="margin:0">La red recibe las muestras I/Q crudas (2 canales × 1024) y aprende sus propios filtros. Adam, lr 0.001, lote 64, 30 épocas; se guarda la mejor época por pérdida de validación.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">exactitud en val <b>48.59 %</b> (RF: 36.26 %)</span>
+    <span class="fact">mejor época <b>29</b> · val loss 1.2799</span>
+    <span class="fact">13 591 parámetros</span>
+    <span class="fact">meseta desde la época ~22, sin sobreajuste</span>
+    <span class="fact">16QAM a ≥ 10 dB: recall 3.3 %</span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/models.py · ModulationCNN (compactado)</span></div>
+<pre><code class="language-python">class ModulationCNN(nn.Module):
+    def __init__(self, num_classes=7):
+        super(ModulationCNN, self).__init__()
+
+        self.features = nn.Sequential(
+            # Entrada: (lote, 2, 1024). Los dos canales son I y Q.
+            nn.Conv1d(in_channels=2, out_channels=16, kernel_size=7, padding=3),
+            nn.ReLU(),
+            nn.MaxPool1d(kernel_size=2),
+
+            # Forma: (lote, 16, 512).
+            nn.Conv1d(in_channels=16, out_channels=32, kernel_size=5, padding=2),
+            nn.ReLU(),
+            nn.MaxPool1d(kernel_size=2),
+
+            # Forma: (lote, 32, 256).
+            nn.Conv1d(in_channels=32, out_channels=64, kernel_size=5, padding=2),
+            nn.ReLU(),
+
+            # Promedio temporal de cada mapa. Salida: (lote, 64, 1).
+            nn.AdaptiveAvgPool1d(1)
+        )
+
+        # Una puntuación por clase.
+        self.classifier = nn.Linear(64, num_classes)
+
+    def forward(self, x):
+        """Transformar un lote I/Q en puntuaciones por clase."""
+        x = self.features(x)
+        x = x.squeeze(-1)            # (lote, 64, 1) -&gt; (lote, 64)
+        logits = self.classifier(x)  # (lote, num_classes)
+        return logits</code></pre>
+      </div>
+      <figure>
+        <a class="img" href="figs/cnn/01_perdida_train_val.png"><img src="figs/cnn/01_perdida_train_val.png" alt="Curvas de pérdida de train y val de la CNN" loading="lazy"></a>
+        <figcaption>Pérdida de train y val en 30 épocas: se aplanan juntas (meseta, no sobreajuste).</figcaption>
+      </figure>
+    </div>
+    <div class="col">
+      <figure>
+        <a class="img" href="figs/cnn/03_exactitud_vs_esn0_val.png"><img src="figs/cnn/03_exactitud_vs_esn0_val.png" alt="Exactitud de la CNN contra Es/N0" loading="lazy"></a>
+        <figcaption>Exactitud de la CNN contra E<sub>s</sub>/N<sub>0</sub> en val: 0.74 a 20 dB.</figcaption>
+      </figure>
+      <figure>
+        <a class="img" href="figs/cnn/07_confusion_porcentajes_val_esn0_10mas.png"><img src="figs/cnn/07_confusion_porcentajes_val_esn0_10mas.png" alt="Matriz de confusión de la CNN a 10 dB o más" loading="lazy"></a>
+        <figcaption>Confusión a ≥ 10 dB: el 61 % de 16QAM se va a 64QAM.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Código: fragmentos copiados de <code>src/</code>; «…» marca lo omitido.</span>
+  <span>Figuras: clic para verlas en tamaño completo.</span>
+  <span>Pendientes y fechas: en Notion.</span>
+</footer>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+try { if (window.hljs) hljs.highlightAll(); } catch (e) { /* sin resaltado: el código queda en texto plano */ }
+</script>
+</body>
+</html>

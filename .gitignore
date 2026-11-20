@@ -1,0 +1,18 @@
+# Entorno virtual (se recrea con requirements.txt)
+.venv/
+
+# Datos generados por src/dataset.py (622 MB)
+data/
+
+# Modelos entrenados (pesados; se regeneran entrenando)
+models/*.pt
+models/*.joblib
+
+# Cachés de Python y Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Configuración local (permisos de Claude Code, editor)
+.claude/settings.local.json
+.vscode/
