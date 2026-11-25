@@ -62,16 +62,23 @@ def analizar(obs, cnn, umbral=None):
     sigue en True (el detector sí vio energía) y la confianza se
     conserva. Con umbral=None no se rechaza nada.
 
-    snr_db es None bajo el piso del estimador. Al medir el error contra
-    snr_inst_db hay que omitir esas filas y las de ruido: en meta.csv
-    su referencia ya es nan.
+    snr_db es None por tres motivos, y queda en None siempre que
+    hay_senal termina en False. Si el detector calla, no se llama a
+    medir_snr(): None significa "no hay señal". Si el detector ve
+    energía y medir_snr() devuelve None, significa "piso del
+    estimador" (el recorte en SNR_PISO_DB, no una medición de -20 dB).
+    Si el detector ve energía y la CNN elige "ruido", el sistema
+    descartó la señal: snr_db pasa a None y la confianza de esa clase
+    se conserva. Al medir el error contra snr_inst_db hay que omitir
+    los tres. El ruido del CSV ya queda fuera: su referencia es nan.
     """
     complejo = iq_a_complejo(obs)
     hay_senal = bool(detectar_senal(complejo))
-    snr_db = medir_snr(complejo)
 
     if not hay_senal:
-        return Resultado(False, snr_db, "ruido", None)
+        return Resultado(False, None, "ruido", None)
+
+    snr_db = medir_snr(complejo)
 
     lote = normalize_iq_batch(np.asarray(obs)[None, ...])
     tensor = torch.from_numpy(np.ascontiguousarray(lote))
@@ -86,6 +93,7 @@ def analizar(obs, cnn, umbral=None):
 
     if clase == "ruido":
         hay_senal = False
+        snr_db = None
     elif umbral is not None and confianza < umbral:
         clase = DESCONOCIDA
 
