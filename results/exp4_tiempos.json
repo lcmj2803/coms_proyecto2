@@ -1,0 +1,72 @@
+{
+  "cpu": "AMD Ryzen 7 5700U with Radeon Graphics",
+  "procesadores_logicos": 16,
+  "torch": "2.4.1+cpu",
+  "sklearn": "1.7.1",
+  "torch_threads": 1,
+  "rf_n_jobs": 1,
+  "filas": [
+    {
+      "modelo": "Random Forest",
+      "modo": "una a una",
+      "n": 195,
+      "media_ms": 6.8711411640740545,
+      "mediana_ms": 6.792763000703417,
+      "p95_ms": 7.36589399894001
+    },
+    {
+      "modelo": "CNN 1D",
+      "modo": "una a una",
+      "n": 195,
+      "media_ms": 0.6928838717636282,
+      "mediana_ms": 0.672152000333881,
+      "p95_ms": 0.8442141994237317
+    },
+    {
+      "modelo": "Random Forest",
+      "modo": "por lote",
+      "n": 100,
+      "media_ms": 0.25158285414093484,
+      "mediana_ms": 0.24811864453155863,
+      "p95_ms": 0.2662129097650734
+    },
+    {
+      "modelo": "CNN 1D",
+      "modo": "por lote",
+      "n": 100,
+      "media_ms": 0.2153516625779872,
+      "mediana_ms": 0.2080586699229059,
+      "p95_ms": 0.2819938343733952
+    }
+  ],
+  "rf_partes_ms": {
+    "una a una": {
+      "extract_features": {
+        "n": 195,
+        "media_ms": 0.25980917443797436,
+        "mediana_ms": 0.25429199922655243,
+        "p95_ms": 0.3024759997060755
+      },
+      "predict": {
+        "n": 195,
+        "media_ms": 6.6654031025395035,
+        "mediana_ms": 6.614458001422463,
+        "p95_ms": 7.014201199490343
+      }
+    },
+    "por lote": {
+      "extract_features": {
+        "n": 100,
+        "media_ms": 0.17924566683618082,
+        "mediana_ms": 0.17566895898468715,
+        "p95_ms": 0.186352288472591
+      },
+      "predict": {
+        "n": 100,
+        "media_ms": 0.07413190914093093,
+        "mediana_ms": 0.07305547851643723,
+        "p95_ms": 0.07814986874699058
+      }
+    }
+  }
+}
