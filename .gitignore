@@ -6,6 +6,7 @@ data/
 
 # Modelos entrenados (pesados; se regeneran entrenando)
 models/*.pt
+!models/cnn.pt 
 models/*.joblib
 
 # Cachés de Python y Jupyter
