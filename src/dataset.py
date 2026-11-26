@@ -11,6 +11,8 @@ TRAIN_CFO_RANGE = (-1e-4, 1e-4)
 # Exp6 ampliará el rango para evaluar generalización.
 EXP6_CFO_RANGE = (-3e-4, 3e-4)
 
+IDEAL_CFO_RANGE = (0.0, 0.0)
+
 # Cualquier orientación inicial de la constelación es posible.
 PHASE_RANGE_RAD = (0.0, 2.0 * np.pi)
 
@@ -24,6 +26,11 @@ TRAIN_DELAYS_SAMPLES = (0, 1, 2)
 
 # Potencias medias relativas: ecos progresivamente más débiles.
 TRAIN_PATH_POWERS_DB = (0.0, -10.0, -20.0)
+
+# Retardos en muestras (con 8 muestras/símbolo, 4 muestras = T/2).
+# Dispersión de retardo rms ≈ 1.46 muestras ≈ 0.18 T, contra ≈ 0.04 T en train.
+EXP6_DELAYS_SAMPLES = (0, 2, 4)
+EXP6_PATH_POWERS_DB = (0.0, -3.0, -6.0)
 
 
 CHANNEL_PROFILES = {
@@ -45,17 +52,25 @@ CHANNEL_PROFILES = {
         "phase_range_rad": PHASE_RANGE_RAD,
         "log10_gain_range": LOG10_GAIN_RANGE,
 
-        # Pendiente de decidir: None NO significa "sin multitrayecto".
+        # Multitrayecto fuerte, con ISI moderada, para el Exp. 6 de generalización.
+        "multipath": {
+            "delays_samples": EXP6_DELAYS_SAMPLES,
+            "path_powers_db": EXP6_PATH_POWERS_DB,
+            "status": "defined",
+        },
+    },
+
+    "ideal": {
+        "cfo_range": IDEAL_CFO_RANGE,
+        "phase_range_rad": PHASE_RANGE_RAD,
+        "log10_gain_range": LOG10_GAIN_RANGE,
         "multipath": {
             "delays_samples": None,
             "path_powers_db": None,
-            "status": "pending",
+            "status": "none",
         },
     },
 }
-
-profile = CHANNEL_PROFILES["train"]
-print(profile["cfo_range"])
 
 #Seis modulaciones a clasificar
 MODS= (
@@ -86,14 +101,19 @@ OBS_PER_PAIR = {
     "train": 500,
     "val": 100,
     "test": 100,
+    "exp6": 100,
+    "ideal": 100,
 }
 
 
-# Misma distribución de canal, realizaciones independientes.
+# train/val/test: misma distribución de canal, realizaciones independientes.
+# exp6 e ideal: canales distintos para evaluar generalización (notebook 09).
 PROFILE_BY_SPLIT = {
     "train": "train",
     "val": "train",
     "test": "train",
+    "exp6": "exp6",
+    "ideal": "ideal",
 }
 
 # Parámetros compartidos por todas las observaciones.
@@ -102,8 +122,6 @@ SPS = 8
 RRC_BETA = 0.35
 RRC_SPAN = 10
 RANDOM_TIMING = True
-
-print("Valores de Es/N0:", ESN0_DB_VALUES)
 
 """ 
 prueba
@@ -117,7 +135,9 @@ SEEDS= {
     "train":1,
     "val":2,
     "test":3,
-} 
+    "exp6":4,
+    "ideal":5,
+}
 
 def save_split(split, X, metadata):
     """Guarda las observaciones y sus metadatos en el mismo orden."""
@@ -150,34 +170,26 @@ def save_split(split, X, metadata):
 
     print("Guardado {}: {}".format(split, X.shape))
 
-for split, n in OBS_PER_PAIR.items():
-    rng = np.random.default_rng(SEEDS[split])
-
-    print(
-    "Conjunto: {} | Semilla: {} | Observaciones por pareja: {}".format(
-        split, SEEDS[split], n
-    )
-)
-
-    # Aquí añadiremos la generación de señales, canal y ruido.
 
 def generate_split(split):
     #Un generador aleatorio propio para este conjunto
     seed = SEEDS[split]
     rng = np.random.default_rng(seed)
     n = OBS_PER_PAIR[split]
-    
-    #los tres conjuntos usan los rangos del perfil train
+                                        
     profile_name = PROFILE_BY_SPLIT[split]
     profile = CHANNEL_PROFILES[profile_name]
     multipath = profile["multipath"]
-    
-    #No utilizar perfiles cuyo multitrayecto sigan pendiente
-    if multipath["status"] != "defined":
+    multipath_status = multipath["status"]
+
+    if multipath_status not in ("defined", "none"):
         raise ValueError(
             "El multitrayecto de {} esta pendiente".format(profile_name)
         )
-        
+
+    # Solo hay desvanecimiento multitrayecto si el perfil lo define.
+    fading = multipath_status == "defined"
+
     per_class = len(ESN0_DB_VALUES) * n
     total = len(CLASS_NAMES) * per_class
     
@@ -210,7 +222,7 @@ def generate_split(split):
                     cfo=cfo,
                     phase=phase,
                     amp=amp,
-                    fading=True,
+                    fading=fading,
                     delays=multipath["delays_samples"],
                     powers_db=multipath["path_powers_db"]
                 )
