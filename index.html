@@ -66,6 +66,22 @@ figure img{display:block;width:100%;height:auto;border-radius:4px}
 figcaption{font-size:12px;color:var(--muted);line-height:1.5}
 figcaption code{color:var(--text)}
 
+.chain a.wip{border-style:dashed;border-color:var(--faded);background:var(--inset);box-shadow:none}
+.chain a.wip b{color:var(--muted)}
+.chain-row{display:flex;flex-direction:column;gap:8px}
+.tag-wip{display:inline-block;margin-left:8px;padding:2px 8px;border:1px dashed var(--faded);border-radius:999px;font-size:11px;letter-spacing:.12em;color:var(--muted);vertical-align:middle;text-transform:uppercase;font-family:var(--mono);font-weight:400}
+
+/* Tablas de resultados */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--inset)}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl caption{caption-side:bottom;text-align:left;padding:8px 12px;font-size:12px;color:var(--muted);line-height:1.5}
+.tbl th,.tbl td{padding:7px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.tbl th{color:var(--muted);font-weight:500;font-size:11.5px;letter-spacing:.06em}
+.tbl td.n,.tbl th.n{text-align:right;font-variant-numeric:tabular-nums}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .best{color:var(--accent);font-weight:700}
+.note{border-left:2px solid var(--accent);padding:4px 0 4px 12px;font-size:13px;line-height:1.55;color:var(--text);margin:0}
+
 footer{display:flex;flex-wrap:wrap;gap:12px 24px;border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:var(--muted)}
 </style>
 </head>
@@ -75,7 +91,7 @@ footer{display:flex;flex-wrap:wrap;gap:12px 24px;border-top:1px solid var(--line
 <header>
   <p class="label" style="margin:0">COMII · Proyecto 2 · AMC · lo que ya está hecho</p>
   <h1>RadioML Command Center</h1>
-  <p class="small" style="margin:0;font-size:15px">Una observación I/Q entra; salen cuatro respuestas: ¿hay señal? → ¿con qué SNR? → ¿qué modulación? → ¿con cuánta confianza? Abajo, cada bloque terminado con su código y su resultado.</p>
+  <p class="small" style="margin:0;font-size:15px">Una observación I/Q entra; salen cuatro respuestas: ¿hay señal? → ¿con qué SNR? → ¿qué modulación? → ¿con cuánta confianza? Abajo, cada bloque terminado con su código y su resultado, y después los experimentos sobre test.</p>
 </header>
 
 <nav class="links" aria-label="Accesos">
@@ -86,13 +102,25 @@ footer{display:flex;flex-wrap:wrap;gap:12px 24px;border-top:1px solid var(--line
   <a href="https://github.com/lcmj2803/coms_proyecto2/tree/main/docs">docs/</a>
 </nav>
 
-<section class="card" aria-label="Bloques hechos" style="display:flex;flex-direction:column;gap:12px">
-  <span class="label">Bloques terminados</span>
-  <div class="chain">
-    <a href="#b1"><span class="label">Bloque 1</span><b>Generación</b></a><span class="arrow">→</span>
-    <a href="#b2"><span class="label">Bloque 2</span><b>Detección y SNR</b></a><span class="arrow">→</span>
-    <a href="#b3"><span class="label">Bloques 3–4</span><b>Cumulantes + RF</b></a><span class="arrow">→</span>
-    <a href="#b5"><span class="label">Bloque 5</span><b>CNN 1D</b></a>
+<section class="card" aria-label="Índice" style="display:flex;flex-direction:column;gap:16px">
+  <div class="chain-row">
+    <span class="label">Bloques terminados</span>
+    <div class="chain">
+      <a href="#b1"><span class="label">Bloque 1</span><b>Generación</b></a><span class="arrow">→</span>
+      <a href="#b2"><span class="label">Bloque 2</span><b>Detección y SNR</b></a><span class="arrow">→</span>
+      <a href="#b3"><span class="label">Bloques 3–4</span><b>Cumulantes + RF</b></a><span class="arrow">→</span>
+      <a href="#b5"><span class="label">Bloque 5</span><b>CNN 1D</b></a><span class="arrow">→</span>
+      <a href="#int"><span class="label">Integración</span><b>analizar()</b></a>
+    </div>
+  </div>
+  <div class="chain-row">
+    <span class="label">Experimentos en test</span>
+    <div class="chain">
+      <a href="#exp4"><span class="label">Exp. 4</span><b>RF frente a CNN</b></a>
+      <a href="#exp5"><span class="label">Exp. 5</span><b>Robustez</b></a>
+      <a href="#exp6" class="wip"><span class="label">Exp. 6 · en curso</span><b>Generalización</b></a>
+      <a href="#cnn2d" class="wip"><span class="label">Bloque 5b · en curso</span><b>CNN 2D</b></a>
+    </div>
   </div>
 </section>
 
@@ -366,6 +394,282 @@ def estimar_snr_espectral(signal):
       <figure>
         <a class="img" href="figs/cnn/07_confusion_porcentajes_val_esn0_10mas.png"><img src="figs/cnn/07_confusion_porcentajes_val_esn0_10mas.png" alt="Matriz de confusión de la CNN a 10 dB o más" loading="lazy"></a>
         <figcaption>Confusión a ≥ 10 dB: el 61 % de 16QAM se va a 64QAM.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== INTEGRACIÓN ========================== -->
+<section class="card block" id="int" aria-labelledby="h-int">
+  <div class="block-head">
+    <span class="label">Integración · <code>src/pipeline.py</code> · <code>06_integración.ipynb</code></span>
+    <h2 id="h-int">Integración: <code>analizar()</code></h2>
+    <p class="small" style="margin:0">Una sola función encadena detector → SNR espectral → CNN y devuelve <code>Resultado(hay_senal, snr_db, clase, confianza)</code>. El detector manda: si calla, la CNN no corre. La CNN puede vetar: si elige «ruido», <code>hay_senal</code> pasa a False. Con <code>umbral</code>, una modulación con confianza baja sale como «desconocida». El Random Forest no entra en la cadena: queda como comparación.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">P<sub>fa</sub> del detector en val <b>11 / 1600</b> = 0.69 %</span>
+    <span class="fact">ruido que sale como modulación: <b>10</b> sin umbral · <b>0</b> con umbral 0.4</span>
+    <span class="fact">no detectadas: <b>2318</b> de 9600 señales</span>
+    <span class="fact">CNN sola <b>40.93 %</b> · detector + CNN <b>39.76 %</b> (solo señales)</span>
+    <span class="fact">error medio de SNR <b>0.506 dB</b> (7279 filas)</span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/pipeline.py · analizar() (sin docstring)</span></div>
+<pre><code class="language-python">def analizar(obs, cnn, umbral=None):
+    complejo = iq_a_complejo(obs)
+    hay_senal = bool(detectar_senal(complejo))
+
+    if not hay_senal:                       # el detector manda
+        return Resultado(False, None, "ruido", None)
+
+    snr_db = medir_snr(complejo)            # del mismo T del detector
+
+    lote = normalize_iq_batch(np.asarray(obs)[None, ...])
+    tensor = torch.from_numpy(np.ascontiguousarray(lote))
+    cnn.eval()
+    with torch.no_grad():
+        proba = torch.softmax(cnn(tensor), dim=1)[0]
+
+    indice = int(torch.argmax(proba))
+    clase = CLASSES[indice]
+    confianza = float(proba[indice])
+
+    if clase == "ruido":                    # la CNN veta
+        hay_senal = False
+        snr_db = None
+    elif umbral is not None and confianza &lt; umbral:
+        clase = DESCONOCIDA
+
+    return Resultado(hay_senal, snr_db, clase, confianza)</code></pre>
+      </div>
+    </div>
+    <div class="col">
+      <figure>
+        <a class="img" href="figs/integracion/exactitud_vs_esn0.png"><img src="figs/integracion/exactitud_vs_esn0.png" alt="Exactitud contra Es/N0 en val: CNN sola, detector más CNN, y detector más CNN con umbral 0.4" loading="lazy"></a>
+        <figcaption>Exactitud en val sobre las 9600 señales (sin el ruido, por eso 40.93 % y no 48.59 %). Detector + CNN solo pierde frente a la CNN sola por debajo de ~4 dB: de las 2318 señales que el detector calla, la CNN sola acertaba 112. El umbral 0.4 lleva a cero el ruido que sale como modulación, pero cuesta exactitud en todo el rango.</figcaption>
+      </figure>
+      <p class="note">El umbral no sale gratis: las señales detectadas a ≤ 0 dB tienen confianzas de 0.15 a 1.00 y las 11 falsas alarmas de 0.17 a 0.39. Las dos poblaciones se solapan, así que bajar la P<sub>fa</sub> con la confianza cuesta P<sub>d</sub>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= EXP. 4 ============================= -->
+<section class="card block" id="exp4" aria-labelledby="h-exp4">
+  <div class="block-head">
+    <span class="label">Exp. 4 · <code>src/evaluacion.py</code> · <code>07_comparacion_test.ipynb</code> · <code>results/exp4_test.npz</code></span>
+    <h2 id="h-exp4">Random Forest frente a CNN 1D en test</h2>
+    <p class="small" style="margin:0">Primera evaluación sobre <code>data/test</code> (11 200 observaciones, semilla 3). No se reentrena nada. Las probabilidades de los dos modelos se ponen en el orden de <code>CLASSES</code>: el RF se reordena por nombre, porque scikit-learn guarda las clases en orden alfabético.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">exactitud en test: RF <b>35.80 %</b> · CNN <b>48.05 %</b></span>
+    <span class="fact">F1 macro: RF 0.35 · CNN 0.44</span>
+    <span class="fact">la CNN gana en <b>15 de 16</b> niveles de E<sub>s</sub>/N<sub>0</sub></span>
+    <span class="fact">a 20 dB: RF 68.17 % · CNN 72.83 %</span>
+    <span class="fact">a −10 dB: los dos ≈ 4 %</span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Clase</th><th class="n">Recall RF</th><th class="n">Recall CNN</th></tr></thead>
+          <tbody>
+            <tr><td>BPSK</td><td class="n">64.62 %</td><td class="n best">69.75 %</td></tr>
+            <tr><td>QPSK</td><td class="n">25.62 %</td><td class="n best">47.38 %</td></tr>
+            <tr><td>8PSK</td><td class="n">25.81 %</td><td class="n best">44.44 %</td></tr>
+            <tr><td>16QAM</td><td class="n best">15.50 %</td><td class="n">2.31 %</td></tr>
+            <tr><td>64QAM</td><td class="n">15.25 %</td><td class="n best">51.94 %</td></tr>
+            <tr><td>16APSK</td><td class="n">25.56 %</td><td class="n best">27.38 %</td></tr>
+            <tr><td>ruido</td><td class="n">78.25 %</td><td class="n best">93.19 %</td></tr>
+          </tbody>
+          <caption>1600 observaciones por clase. 16QAM es la única clase en la que el RF gana.</caption>
+        </table>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Modelo</th><th>Modo</th><th class="n">Media (ms/obs)</th><th class="n">p95 (ms)</th></tr></thead>
+          <tbody>
+            <tr><td>Random Forest</td><td>una a una</td><td class="n">6.871</td><td class="n">7.366</td></tr>
+            <tr><td>CNN 1D</td><td>una a una</td><td class="n best">0.693</td><td class="n">0.844</td></tr>
+            <tr><td>Random Forest</td><td>lote de 256</td><td class="n">0.252</td><td class="n">0.266</td></tr>
+            <tr><td>CNN 1D</td><td>lote de 256</td><td class="n best">0.215</td><td class="n">0.282</td></tr>
+          </tbody>
+          <caption>Ryzen 7 5700U, 1 hilo, torch 2.4.1 (CPU), sklearn 1.7.1. Una a una, el RF pierde por el <code>predict</code> (6.67 ms de costo fijo de los 200 árboles), no por los cumulantes (0.26 ms). En lote, los dos quedan parejos.</caption>
+        </table>
+      </div>
+    </div>
+    <div class="col">
+      <figure>
+        <a class="img" href="figs/comparacion_test/01_exactitud_vs_esn0_test.png"><img src="figs/comparacion_test/01_exactitud_vs_esn0_test.png" alt="Exactitud de RF y CNN contra Es/N0 en test" loading="lazy"></a>
+        <figcaption>Exactitud contra E<sub>s</sub>/N<sub>0</sub> en test (600 señales por nivel; el ruido va aparte).</figcaption>
+      </figure>
+      <figure>
+        <a class="img" href="figs/comparacion_test/02_confusion_porcentajes_test.png"><img src="figs/comparacion_test/02_confusion_porcentajes_test.png" alt="Matrices de confusión de RF y CNN en test, en porcentajes" loading="lazy"></a>
+        <figcaption>Matrices de confusión en test (% por fila): RF a la izquierda, CNN a la derecha.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= EXP. 5 ============================= -->
+<section class="card block" id="exp5" aria-labelledby="h-exp5">
+  <div class="block-head">
+    <span class="label">Exp. 5 · <code>08_robustez.ipynb</code> · sobre <code>results/exp4_test.npz</code></span>
+    <h2 id="h-exp5">Robustez: exactitud por modulación y E<sub>s</sub>/N<sub>0</sub></h2>
+    <p class="small" style="margin:0">Las mismas predicciones de test, ahora separadas por modulación (100 muestras por punto). Cada curva se resume por el E<sub>s</sub>/N<sub>0</sub> en que cruza el 50 %, interpolando entre los dos niveles que lo rodean.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">16QAM a ≥ 10 dB, CNN: <b>17 / 600</b> bien · 370 → 64QAM · 152 → 16APSK</span>
+    <span class="fact">16QAM a 20 dB, CNN: recall <b>0 %</b></span>
+    <span class="fact">64QAM predicho a ≥ 10 dB: solo <b>45 %</b> correcto (482 / 1077)</span>
+    <span class="fact">±5 puntos cerca del 50 % → cruces ≈ ±1 dB</span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Modulación</th><th class="n">Cruce 50 % RF</th><th class="n">Cruce 50 % CNN</th></tr></thead>
+          <tbody>
+            <tr><td>BPSK</td><td class="n">−0.46 dB</td><td class="n">−1.71 dB</td></tr>
+            <tr><td>QPSK</td><td class="n">14.00 dB</td><td class="n best">6.56 dB</td></tr>
+            <tr><td>8PSK</td><td class="n">13.50 dB</td><td class="n best">7.33 dB</td></tr>
+            <tr><td>16APSK</td><td class="n">13.43 dB</td><td class="n">11.73 dB</td></tr>
+            <tr><td>64QAM</td><td class="n">no lo cruza</td><td class="n">2.67 dB*</td></tr>
+            <tr><td>16QAM</td><td class="n">no lo cruza</td><td class="n">no lo cruza</td></tr>
+          </tbody>
+          <caption>Resaltado: ventaja clara (≈ 6–7 dB). En BPSK y 16APSK la diferencia es menor de 2 dB, del orden de la incertidumbre. *El 64QAM de la CNN es un empate que la red resuelve siempre hacia 64QAM: parece bueno porque se traga al 16QAM.</caption>
+        </table>
+      </div>
+      <p class="note">El fallo de 16QAM no es ruido: a 20 dB el recall de la CNN es 0 %. El error es entre modulaciones. El RF tampoco separa las dos QAM (182 a 16QAM y 197 a 64QAM a ≥ 10 dB), pero reparte; la CNN empuja todo hacia 64QAM.</p>
+    </div>
+    <div class="col">
+      <figure>
+        <a class="img" href="figs/robustez/01_accuracy_por_modulacion.png"><img src="figs/robustez/01_accuracy_por_modulacion.png" alt="Exactitud contra Es/N0 por modulación, RF y CNN" loading="lazy"></a>
+        <figcaption>Exp. 5 · exactitud contra E<sub>s</sub>/N<sub>0</sub>, un panel por modulación, RF frente a CNN.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= EXP. 6 ============================= -->
+<section class="card block" id="exp6" aria-labelledby="h-exp6">
+  <div class="block-head">
+    <span class="label">Exp. 6 · <code>src/dataset.py</code> · <code>09_generalizacion.ipynb</code></span>
+    <h2 id="h-exp6">Generalización a canales no vistos <span class="tag-wip">en curso</span></h2>
+    <p class="small" style="margin:0">Los mismos modelos, sin reentrenar, frente a dos canales nuevos de 11 200 observaciones cada uno: <b>ideal</b> (sin multitrayecto ni CFO) y <b>exp6</b> (multitrayecto fuerte y CFO hasta 3·10<sup>−4</sup>). Fase y ganancia A se sortean igual que en train.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">exp6: retardos <b>0 / 2 / 4</b> muestras · <b>0 / −3 / −6</b> dB</span>
+    <span class="fact">dispersión rms ≈ <b>0.18 T</b> (train: ≈ 0.04 T)</span>
+    <span class="fact">SNR inst − nominal en exp6: de −23.4 a +9.6 dB</span>
+    <span class="fact">ruido: recall CNN ≈ 93–94 % en los tres canales</span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Canal</th><th class="n">N</th><th class="n">RF</th><th class="n">CNN</th></tr></thead>
+          <tbody>
+            <tr><td>ideal</td><td class="n">9600</td><td class="n">34.03 %</td><td class="n">45.35 %</td></tr>
+            <tr><td>el de train (test)</td><td class="n">9600</td><td class="n">28.73 %</td><td class="n">40.53 %</td></tr>
+            <tr><td>exp6 (fuerte)</td><td class="n">9600</td><td class="n">23.90 %</td><td class="n">36.36 %</td></tr>
+            <tr><td>exp6, |CFO| ≤ 10<sup>−4</sup></td><td class="n">3168</td><td class="n">27.34 %</td><td class="n">35.70 %</td></tr>
+          </tbody>
+          <caption>Exactitud solo sobre las señales moduladas. Los dos modelos pierden ≈ 5 puntos con el canal fuerte y ganan ≈ 5 sin canal.</caption>
+        </table>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Canal</th><th class="n">16QAM → 64QAM, CNN (≥ 10 dB)</th><th class="n">Recall 16QAM, CNN (≥ 10 dB)</th></tr></thead>
+          <tbody>
+            <tr><td>ideal</td><td class="n">63 %</td><td class="n">3.3 %</td></tr>
+            <tr><td>test</td><td class="n">62 %</td><td class="n">2.8 %</td></tr>
+            <tr><td>exp6</td><td class="n">79 %</td><td class="n">2.3 %</td></tr>
+          </tbody>
+          <caption>El colapso 16QAM → 64QAM aparece también sin multitrayecto ni CFO: no lo causa el canal.</caption>
+        </table>
+      </div>
+    </div>
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/dataset.py · perfiles de canal (extracto)</span></div>
+<pre><code class="language-python">IDEAL_CFO_RANGE = (0.0, 0.0)
+
+# Retardos en muestras (con 8 muestras/símbolo, 4 muestras = T/2).
+# Dispersión de retardo rms ≈ 1.46 muestras ≈ 0.18 T, contra ≈ 0.04 T en train.
+EXP6_DELAYS_SAMPLES = (0, 2, 4)
+EXP6_PATH_POWERS_DB = (0.0, -3.0, -6.0)
+
+    # … dentro de CHANNEL_PROFILES["exp6"] …
+        "multipath": {
+            "delays_samples": EXP6_DELAYS_SAMPLES,
+            "path_powers_db": EXP6_PATH_POWERS_DB,
+            "status": "defined",
+        },
+
+# Solo hay desvanecimiento multitrayecto si el perfil lo define.
+fading = multipath_status == "defined"</code></pre>
+      </div>
+      <p class="note">Con el CFO de exp6 limitado al rango de train, la CNN no se recupera (36.36 % → 35.70 %): para ella, la caída viene del multitrayecto, no del CFO. El RF sí recupera una parte (23.90 % → 27.34 %). Es una lectura con un solo corte; falta confirmarla.</p>
+      <p class="small" style="margin:0"><b>Pendiente:</b> el set de GNU Radio (<code>radioml_tx.grc</code>, QPSK con <i>Constellation Modulator</i>, sps = 8, β = 0.35). Primero hay que calibrar su E<sub>s</sub>: GNU Radio fija la potencia por muestra y <code>generator.py</code> la energía por símbolo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CNN 2D ============================ -->
+<section class="card block" id="cnn2d" aria-labelledby="h-cnn2d">
+  <div class="block-head">
+    <span class="label">Bloque 5b · <code>src/constelacion.py</code> · <code>10_cnn_2d.ipynb</code></span>
+    <h2 id="h-cnn2d">CNN 2D sobre la constelación <span class="tag-wip">en curso</span></h2>
+    <p class="small" style="margin:0">La idea: darle a la red la constelación ya recuperada en vez del I/Q crudo, porque ahí 16QAM y 64QAM tienen rejillas distintas. Cada observación pasa por filtro acoplado RRC → fase de muestreo de máxima energía (118 símbolos) → normalización RMS → corrección de CFO y fase con la línea espectral de s<sup>M</sup> → histograma 2D de 32 × 32 en [−1.5, 1.5].</p>
+  </div>
+  <div class="facts">
+    <span class="fact">imágenes 32 × 32 para train / val / test / ideal / exp6</span>
+    <span class="fact">≈ <b>0.5 ms</b> por observación</span>
+    <span class="fact">sin línea espectral (M = 0): no se corrige el CFO</span>
+    <span class="fact">falta: definir y entrenar la red</span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">src/constelacion.py · simbolos_corregidos() · imagen_constelacion()</span></div>
+<pre><code class="language-python">def simbolos_corregidos(obs):
+    """Recupera 118 símbolos complejos de una observación I/Q de 1024 muestras."""
+    z = filtro_adaptado(a_complejo(obs))
+    s, _ = temporizacion(z)
+    s = normalizar_rms(s)
+
+    M, cfo, _ = elegir_m(s)
+    if M == 0:
+        # Sin línea no hay estimación confiable: mejor no corregir que meter un CFO falso.
+        return s
+
+    # Quitar el giro que se acumula de símbolo a símbolo.
+    n = np.arange(s.size)
+    sin_cfo = s * np.exp(-2j * np.pi * cfo * n)
+
+    # Estimar y quitar la fase constante después de corregir el CFO.
+    referencia = np.pi if M == 4 else 0.0
+    theta = (np.angle(np.mean(sin_cfo ** M)) - referencia) / M
+    return sin_cfo * np.exp(-1j * theta)
+
+
+def imagen_constelacion(obs, bins=N_BINS, rango=RANGO_IMAGEN):
+    s = simbolos_corregidos(obs)
+    conteo, _, _ = np.histogram2d(
+        s.real, s.imag,
+        bins=bins,
+        range=[[-rango, rango], [-rango, rango]],
+    )
+    # Fracción de símbolos por píxel; .T deja [Q, I] como espera imshow.
+    return (conteo / s.size).T.astype(np.float32)</code></pre>
+      </div>
+    </div>
+    <div class="col">
+      <figure>
+        <a class="img" href="figs/cnn2d/01_imagenes_por_clase.png"><img src="figs/cnn2d/01_imagenes_por_clase.png" alt="Imágenes de constelación 32 por 32 de las seis modulaciones en train a 20 dB" loading="lazy"></a>
+        <figcaption>Imágenes 32 × 32 en train a 20 dB, 8 observaciones sumadas por clase. 16QAM ya muestra su rejilla de 4 × 4; 64QAM todavía no muestra la suya.</figcaption>
       </figure>
     </div>
   </div>
